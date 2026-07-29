@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 420" width="100%" height="420">
+  <defs>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1f242d"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="accentOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF416C"/>
+      <stop offset="100%" stop-color="#FF4B2B"/>
+    </linearGradient>
+    <linearGradient id="accentBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="100%" stop-color="#4FACFE"/>
+    </linearGradient>
+    <linearGradient id="accentPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8A2387"/>
+      <stop offset="100%" stop-color="#E94057"/>
+    </linearGradient>
+    <linearGradient id="accentGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#11998e"/>
+      <stop offset="100%" stop-color="#38ef7d"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Input Sources Box -->
+  <g transform="translate(30, 40)">
+    <rect width="220" height="150" rx="12" fill="url(#boxGrad1)" stroke="#FF416C" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentOrange)"/>
+    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">📥 Credentials Input</text>
+    <text x="20" y="65" font-family="monospace" font-size="12" fill="#e6edf3">• data/guests.json</text>
+    <text x="20" y="90" font-family="monospace" font-size="12" fill="#e6edf3">• data/level_accounts.json</text>
+    <text x="20" y="115" font-family="monospace" font-size="12" fill="#e6edf3">• data/guests.db (SQLite)</text>
+    <text x="20" y="140" font-family="monospace" font-size="12" fill="#8b949e">• CLI Arguments</text>
+  </g>
+
+  <!-- Async Engine Box -->
+  <g transform="translate(315, 30)">
+    <rect width="220" height="170" rx="12" fill="url(#boxGrad1)" stroke="#00F2FE" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentBlue)"/>
+    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">⚡ Async Checker Engine</text>
+    <text x="20" y="62" font-family="sans-serif" font-size="12" fill="#e6edf3">guest_checker.py</text>
+    <text x="20" y="85" font-family="sans-serif" font-size="11" fill="#8b949e">• Concurrency Semaphore</text>
+    <text x="20" y="105" font-family="sans-serif" font-size="11" fill="#8b949e">• Asyncio Task Queue</text>
+    <text x="20" y="125" font-family="sans-serif" font-size="11" fill="#8b949e">• HTTPX Connection Pool</text>
+    <text x="20" y="148" font-family="sans-serif" font-size="11" fill="#8b949e">• Signal Handler</text>
+  </g>
+
+  <!-- Auth & Info Core Box -->
+  <g transform="translate(600, 40)">
+    <rect width="220" height="150" rx="12" fill="url(#boxGrad1)" stroke="#8A2387" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentPurple)"/>
+    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">🔐 Protocol & Crypto</text>
+    <text x="20" y="65" font-family="sans-serif" font-size="11" fill="#e6edf3">• LevelAuth (OAuth 2.0)</text>
+    <text x="20" y="88" font-family="sans-serif" font-size="11" fill="#e6edf3">• MajorLogin (AES CBC)</text>
+    <text x="20" y="111" font-family="sans-serif" font-size="11" fill="#e6edf3">• GuestInfo (PersonalShow)</text>
+    <text x="20" y="134" font-family="sans-serif" font-size="11" fill="#e6edf3">• Protobuf Decoders</text>
+  </g>
+
+  <!-- Output Box -->
+  <g transform="translate(315, 250)">
+    <rect width="220" height="130" rx="12" fill="url(#boxGrad1)" stroke="#38ef7d" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentGreen)"/>
+    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">📊 Output & Export</text>
+    <text x="20" y="62" font-family="monospace" font-size="12" fill="#e6edf3">• Terminal ANSI Report</text>
+    <text x="20" y="85" font-family="monospace" font-size="12" fill="#e6edf3">• guest_report.json</text>
+    <text x="20" y="108" font-family="monospace" font-size="12" fill="#8b949e">• SQLite Status Sync</text>
+  </g>
+
+  <!-- Connective Arrows -->
+  <path d="M 250 115 L 315 115" stroke="#FF416C" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 535 115 L 600 115" stroke="#00F2FE" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 425 200 L 425 250" stroke="#38ef7d" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Arrowhead Marker -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#00F2FE"/>
+    </marker>
+  </defs>
+</svg>

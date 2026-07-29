@@ -1,119 +1,12 @@
 <div align="center">
 
 <!-- Animated Header Banner -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 220" width="100%" height="220">
-  <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0d1117">
-        <animate attributeName="stop-color" values="#0d1117; #161b22; #1f242d; #0d1117" dur="10s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="50%" stop-color="#161b22">
-        <animate attributeName="stop-color" values="#161b22; #2d1b3f; #162a3f; #161b22" dur="10s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="100%" stop-color="#0a0c10">
-        <animate attributeName="stop-color" values="#0a0c10; #0d1117; #121820; #0a0c10" dur="10s" repeatCount="indefinite" />
-      </stop>
-    </linearGradient>
-
-    <!-- Glowing Text Gradient -->
-    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FF416C">
-        <animate attributeName="stop-color" values="#FF416C; #8A2387; #00F2FE; #FF416C" dur="6s" repeatCount="indefinite"/>
-      </stop>
-      <stop offset="50%" stop-color="#8A2387">
-        <animate attributeName="stop-color" values="#8A2387; #E94057; #4FACFE; #8A2387" dur="6s" repeatCount="indefinite"/>
-      </stop>
-      <stop offset="100%" stop-color="#FF4B2B">
-        <animate attributeName="stop-color" values="#FF4B2B; #F27121; #00C6FF; #FF4B2B" dur="6s" repeatCount="indefinite"/>
-      </stop>
-    </linearGradient>
-
-    <!-- Subtitle Glow Gradient -->
-    <linearGradient id="subGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00F2FE"/>
-      <stop offset="100%" stop-color="#4FACFE"/>
-    </linearGradient>
-
-    <!-- Card Border Gradient -->
-    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF416C" stop-opacity="0.8"/>
-      <stop offset="50%" stop-color="#8A2387" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#00F2FE" stop-opacity="0.8"/>
-    </linearGradient>
-
-    <!-- Drop Shadow Filter -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
-
-  <!-- Card Background -->
-  <rect width="896" height="216" x="2" y="2" rx="20" ry="20" fill="url(#bgGradient)" stroke="url(#borderGrad)" stroke-width="2"/>
-
-  <!-- Decorative Particle Circles -->
-  <circle cx="80" cy="50" r="3" fill="#FF416C" opacity="0.6">
-    <animate attributeName="r" values="2;5;2" dur="3s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="820" cy="160" r="4" fill="#00F2FE" opacity="0.7">
-    <animate attributeName="r" values="3;7;3" dur="4s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.4;1;0.4" dur="4s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="780" cy="40" r="2.5" fill="#F27121" opacity="0.5">
-    <animate attributeName="r" values="1;4;1" dur="2.5s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="120" cy="170" r="3.5" fill="#8A2387" opacity="0.6">
-    <animate attributeName="r" values="2;6;2" dur="3.5s" repeatCount="indefinite"/>
-  </circle>
-
-  <!-- Title Text -->
-  <text x="450" y="85" text-anchor="middle" font-family="'Segoe UI', Ubuntu, Helvetica, sans-serif" font-weight="900" font-size="38" fill="url(#textGrad)" filter="url(#glow)" letter-spacing="2">
-    GUEST ACCOUNT CHECKER
-  </text>
-
-  <!-- Subtitle Text -->
-  <text x="450" y="125" text-anchor="middle" font-family="'Segoe UI', Ubuntu, Helvetica, sans-serif" font-weight="600" font-size="16" fill="url(#subGrad)" letter-spacing="1">
-    ⚡ Bulk Free Fire Guest Verification Engine • Fast, Async & Precise ⚡
-  </text>
-
-  <!-- Feature Tags in SVG -->
-  <g transform="translate(180, 150)">
-    <!-- Tag 1 -->
-    <rect x="0" y="0" width="130" height="28" rx="14" fill="#FF416C" fill-opacity="0.15" stroke="#FF416C" stroke-width="1"/>
-    <text x="65" y="18" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#FF416C">🔥 High Speed</text>
-
-    <!-- Tag 2 -->
-    <rect x="150" y="0" width="130" height="28" rx="14" fill="#8A2387" fill-opacity="0.15" stroke="#8A2387" stroke-width="1"/>
-    <text x="215" y="18" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#DDA0DD">🛡️ OAuth & Proto</text>
-
-    <!-- Tag 3 -->
-    <rect x="300" y="0" width="130" height="28" rx="14" fill="#00F2FE" fill-opacity="0.15" stroke="#00F2FE" stroke-width="1"/>
-    <text x="365" y="18" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#00F2FE">⚡ Async Concurrency</text>
-
-    <!-- Tag 4 -->
-    <rect x="450" y="0" width="130" height="28" rx="14" fill="#F27121" fill-opacity="0.15" stroke="#F27121" stroke-width="1"/>
-    <text x="515" y="18" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#F27121">📱 Termux Ready</text>
-  </g>
-</svg>
+![](assets/banner.svg)
 
 <br/>
 
 <!-- Animated Typing Terminal SVG -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 60" width="100%" height="60">
-  <rect width="800" height="60" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
-  <circle cx="20" cy="30" r="6" fill="#ff5f56"/>
-  <circle cx="40" cy="30" r="6" fill="#ffbd2e"/>
-  <circle cx="60" cy="30" r="6" fill="#27c93f"/>
-  <text x="85" y="35" font-family="'Courier New', Courier, monospace" font-size="14" fill="#58a6ff" font-weight="bold">$</text>
-  <text x="100" y="35" font-family="'Courier New', Courier, monospace" font-size="14" fill="#e6edf3">
-    python3 guest_checker.py --json data/guests.json --concurrent 5
-  </text>
-  <rect x="635" y="22" width="8" height="18" fill="#58a6ff">
-    <animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite"/>
-  </rect>
-</svg>
+![](assets/graphic-1.svg)
 
 <br/><br/>
 
@@ -127,19 +20,7 @@
 <br/>
 
 <!-- Animated Pulse Status Badge -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 30" width="650" height="30">
-  <style>
-    .pulse { animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { fill-opacity: 1; } 50% { fill-opacity: 0.3; } 100% { fill-opacity: 1; } }
-  </style>
-  <rect width="650" height="30" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <circle cx="20" cy="15" r="5" fill="#2ea44f" class="pulse"/>
-  <text x="32" y="19" font-family="sans-serif" font-size="11" font-weight="bold" fill="#7ee787">SYSTEM STATUS: ONLINE</text>
-  <text x="210" y="19" font-family="sans-serif" font-size="11" fill="#8b949e">|</text>
-  <text x="230" y="19" font-family="sans-serif" font-size="11" font-weight="bold" fill="#58a6ff">OAUTH GATEWAY: OPERATIONAL</text>
-  <text x="440" y="19" font-family="sans-serif" font-size="11" fill="#8b949e">|</text>
-  <text x="460" y="19" font-family="sans-serif" font-size="11" font-weight="bold" fill="#d2a8ff">PROTOBUF v4.24 READY</text>
-</svg>
+![](assets/status-badge.svg)
 
 </div>
 
@@ -220,90 +101,7 @@ The following diagram illustrates how the Guest Account Checker coordinates inpu
 
 <div align="center">
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 420" width="100%" height="420">
-  <defs>
-    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1f242d"/>
-      <stop offset="100%" stop-color="#0d1117"/>
-    </linearGradient>
-    <linearGradient id="accentOrange" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FF416C"/>
-      <stop offset="100%" stop-color="#FF4B2B"/>
-    </linearGradient>
-    <linearGradient id="accentBlue" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00F2FE"/>
-      <stop offset="100%" stop-color="#4FACFE"/>
-    </linearGradient>
-    <linearGradient id="accentPurple" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#8A2387"/>
-      <stop offset="100%" stop-color="#E94057"/>
-    </linearGradient>
-    <linearGradient id="accentGreen" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#11998e"/>
-      <stop offset="100%" stop-color="#38ef7d"/>
-    </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-  </defs>
-
-  <!-- Input Sources Box -->
-  <g transform="translate(30, 40)">
-    <rect width="220" height="150" rx="12" fill="url(#boxGrad1)" stroke="#FF416C" stroke-width="2" filter="url(#shadow)"/>
-    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentOrange)"/>
-    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">📥 Credentials Input</text>
-    <text x="20" y="65" font-family="monospace" font-size="12" fill="#e6edf3">• data/guests.json</text>
-    <text x="20" y="90" font-family="monospace" font-size="12" fill="#e6edf3">• data/level_accounts.json</text>
-    <text x="20" y="115" font-family="monospace" font-size="12" fill="#e6edf3">• data/guests.db (SQLite)</text>
-    <text x="20" y="140" font-family="monospace" font-size="12" fill="#8b949e">• CLI Arguments</text>
-  </g>
-
-  <!-- Async Engine Box -->
-  <g transform="translate(315, 30)">
-    <rect width="220" height="170" rx="12" fill="url(#boxGrad1)" stroke="#00F2FE" stroke-width="2" filter="url(#shadow)"/>
-    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentBlue)"/>
-    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">⚡ Async Checker Engine</text>
-    <text x="20" y="62" font-family="sans-serif" font-size="12" fill="#e6edf3">guest_checker.py</text>
-    <text x="20" y="85" font-family="sans-serif" font-size="11" fill="#8b949e">• Concurrency Semaphore</text>
-    <text x="20" y="105" font-family="sans-serif" font-size="11" fill="#8b949e">• Asyncio Task Queue</text>
-    <text x="20" y="125" font-family="sans-serif" font-size="11" fill="#8b949e">• HTTPX Connection Pool</text>
-    <text x="20" y="148" font-family="sans-serif" font-size="11" fill="#8b949e">• Signal Handler</text>
-  </g>
-
-  <!-- Auth & Info Core Box -->
-  <g transform="translate(600, 40)">
-    <rect width="220" height="150" rx="12" fill="url(#boxGrad1)" stroke="#8A2387" stroke-width="2" filter="url(#shadow)"/>
-    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentPurple)"/>
-    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">🔐 Protocol & Crypto</text>
-    <text x="20" y="65" font-family="sans-serif" font-size="11" fill="#e6edf3">• LevelAuth (OAuth 2.0)</text>
-    <text x="20" y="88" font-family="sans-serif" font-size="11" fill="#e6edf3">• MajorLogin (AES CBC)</text>
-    <text x="20" y="111" font-family="sans-serif" font-size="11" fill="#e6edf3">• GuestInfo (PersonalShow)</text>
-    <text x="20" y="134" font-family="sans-serif" font-size="11" fill="#e6edf3">• Protobuf Decoders</text>
-  </g>
-
-  <!-- Output Box -->
-  <g transform="translate(315, 250)">
-    <rect width="220" height="130" rx="12" fill="url(#boxGrad1)" stroke="#38ef7d" stroke-width="2" filter="url(#shadow)"/>
-    <rect x="0" y="0" width="220" height="36" rx="12" fill="url(#accentGreen)"/>
-    <text x="110" y="23" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="14">📊 Output & Export</text>
-    <text x="20" y="62" font-family="monospace" font-size="12" fill="#e6edf3">• Terminal ANSI Report</text>
-    <text x="20" y="85" font-family="monospace" font-size="12" fill="#e6edf3">• guest_report.json</text>
-    <text x="20" y="108" font-family="monospace" font-size="12" fill="#8b949e">• SQLite Status Sync</text>
-  </g>
-
-  <!-- Connective Arrows -->
-  <path d="M 250 115 L 315 115" stroke="#FF416C" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 535 115 L 600 115" stroke="#00F2FE" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
-  <path d="M 425 200 L 425 250" stroke="#38ef7d" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
-
-  <!-- Arrowhead Marker -->
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#00F2FE"/>
-    </marker>
-  </defs>
-</svg>
+![](assets/status-badge-1.svg)
 
 </div>
 
@@ -323,61 +121,7 @@ The account verification lifecycle comprises **3 sequential stages**:
 
 <div align="center">
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" width="100%" height="300">
-  <defs>
-    <linearGradient id="stage1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#2d3748"/>
-      <stop offset="100%" stop-color="#1a202c"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Stage 1 Card -->
-  <g transform="translate(20, 30)">
-    <rect width="240" height="230" rx="10" fill="url(#stage1)" stroke="#4A5568" stroke-width="2"/>
-    <rect width="240" height="35" rx="10" fill="#3182CE"/>
-    <text x="120" y="22" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="13">STAGE 1: OAuth Verification</text>
-    <text x="15" y="60" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Sends OpenID Request</text>
-    <text x="15" y="80" font-family="sans-serif" font-size="11" fill="#CBD5E0">  UID + Password</text>
-    <text x="15" y="110" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Checks Garena Auth Server</text>
-    <text x="15" y="140" font-family="sans-serif" font-size="11" fill="#68D391">✔ Returns: OAuth Token</text>
-    <text x="15" y="165" font-family="sans-serif" font-size="11" fill="#FC8181">❌ If Invalid -> DEAD</text>
-    <text x="15" y="190" font-family="sans-serif" font-size="11" fill="#E53E3E">❌ If Banned -> BANNED</text>
-  </g>
-
-  <!-- Connector 1 -->
-  <path d="M 260 145 L 290 145" stroke="#3182CE" stroke-width="3" fill="none"/>
-  <polygon points="290,140 300,145 290,150" fill="#3182CE"/>
-
-  <!-- Stage 2 Card -->
-  <g transform="translate(300, 30)">
-    <rect width="240" height="230" rx="10" fill="url(#stage1)" stroke="#4A5568" stroke-width="2"/>
-    <rect width="240" height="35" rx="10" fill="#805AD5"/>
-    <text x="120" y="22" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="13">STAGE 2: MajorLogin Gateway</text>
-    <text x="15" y="60" font-family="sans-serif" font-size="11" fill="#E2E8F0">• AES-CBC Encrypted Payload</text>
-    <text x="15" y="80" font-family="sans-serif" font-size="11" fill="#CBD5E0">  Template Hex + Token</text>
-    <text x="15" y="110" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Parses Protobuf Response</text>
-    <text x="15" y="140" font-family="sans-serif" font-size="11" fill="#68D391">✔ Extracts: Dynamic Server URL</text>
-    <text x="15" y="165" font-family="sans-serif" font-size="11" fill="#CBD5E0">  AES Key & IV + Session JWT</text>
-    <text x="15" y="190" font-family="sans-serif" font-size="11" fill="#F6AD55">⚠️ If 503 -> SERVER_DOWN</text>
-  </g>
-
-  <!-- Connector 2 -->
-  <path d="M 540 145 L 570 145" stroke="#805AD5" stroke-width="3" fill="none"/>
-  <polygon points="570,140 580,145 570,150" fill="#805AD5"/>
-
-  <!-- Stage 3 Card -->
-  <g transform="translate(580, 30)">
-    <rect width="240" height="230" rx="10" fill="url(#stage1)" stroke="#4A5568" stroke-width="2"/>
-    <rect width="240" height="35" rx="10" fill="#38A169"/>
-    <text x="120" y="22" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="13">STAGE 3: PlayerPersonalShow</text>
-    <text x="15" y="60" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Encrypts Target UID</text>
-    <text x="15" y="80" font-family="sans-serif" font-size="11" fill="#CBD5E0">  dev_generator protobuf</text>
-    <text x="15" y="110" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Queries GetPlayerPersonalShow</text>
-    <text x="15" y="140" font-family="sans-serif" font-size="11" fill="#68D391">✔ Decodes data_pb2 AccountInfo</text>
-    <text x="15" y="165" font-family="sans-serif" font-size="11" fill="#68D391">  (Level, Likes, Nick, Clan)</text>
-    <text x="15" y="190" font-family="sans-serif" font-size="11" fill="#38A169">🎉 Status -> ALIVE</text>
-  </g>
-</svg>
+![](assets/status-badge-2.svg)
 
 </div>
 
@@ -389,41 +133,7 @@ Below is an overview of how account statuses are categorized during check execut
 
 <div align="center">
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 180" width="100%" height="180">
-  <rect width="700" height="180" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
-
-  <!-- Meter Bar 1: ALIVE -->
-  <g transform="translate(30, 25)">
-    <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="bold" fill="#7ee787">ALIVE (Valid & Reachable)</text>
-    <rect x="220" y="2" width="400" height="18" rx="9" fill="#21262d"/>
-    <rect x="220" y="2" width="340" height="18" rx="9" fill="#238636"/>
-    <text x="630" y="15" font-family="monospace" font-size="12" fill="#7ee787">85%</text>
-  </g>
-
-  <!-- Meter Bar 2: SERVER_DOWN -->
-  <g transform="translate(30, 65)">
-    <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="bold" fill="#d29922">SERVER_DOWN (OAuth Valid)</text>
-    <rect x="220" y="2" width="400" height="18" rx="9" fill="#21262d"/>
-    <rect x="220" y="2" width="40" height="18" rx="9" fill="#9e6a03"/>
-    <text x="630" y="15" font-family="monospace" font-size="12" fill="#d29922">10%</text>
-  </g>
-
-  <!-- Meter Bar 3: BANNED -->
-  <g transform="translate(30, 105)">
-    <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="bold" fill="#f85149">BANNED (Suspended)</text>
-    <rect x="220" y="2" width="400" height="18" rx="9" fill="#21262d"/>
-    <rect x="220" y="2" width="16" height="18" rx="8" fill="#da3633"/>
-    <text x="630" y="15" font-family="monospace" font-size="12" fill="#f85149">3%</text>
-  </g>
-
-  <!-- Meter Bar 4: DEAD -->
-  <g transform="translate(30, 145)">
-    <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="bold" fill="#8b949e">DEAD (Invalid Password)</text>
-    <rect x="220" y="2" width="400" height="18" rx="9" fill="#21262d"/>
-    <rect x="220" y="2" width="8" height="18" rx="4" fill="#484f58"/>
-    <text x="630" y="15" font-family="monospace" font-size="12" fill="#8b949e">2%</text>
-  </g>
-</svg>
+![](assets/graphic-5.svg)
 
 </div>
 

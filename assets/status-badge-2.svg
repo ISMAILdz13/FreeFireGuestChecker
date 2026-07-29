@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" width="100%" height="300">
+  <defs>
+    <linearGradient id="stage1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2d3748"/>
+      <stop offset="100%" stop-color="#1a202c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Stage 1 Card -->
+  <g transform="translate(20, 30)">
+    <rect width="240" height="230" rx="10" fill="url(#stage1)" stroke="#4A5568" stroke-width="2"/>
+    <rect width="240" height="35" rx="10" fill="#3182CE"/>
+    <text x="120" y="22" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="13">STAGE 1: OAuth Verification</text>
+    <text x="15" y="60" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Sends OpenID Request</text>
+    <text x="15" y="80" font-family="sans-serif" font-size="11" fill="#CBD5E0">  UID + Password</text>
+    <text x="15" y="110" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Checks Garena Auth Server</text>
+    <text x="15" y="140" font-family="sans-serif" font-size="11" fill="#68D391">✔ Returns: OAuth Token</text>
+    <text x="15" y="165" font-family="sans-serif" font-size="11" fill="#FC8181">❌ If Invalid -> DEAD</text>
+    <text x="15" y="190" font-family="sans-serif" font-size="11" fill="#E53E3E">❌ If Banned -> BANNED</text>
+  </g>
+
+  <!-- Connector 1 -->
+  <path d="M 260 145 L 290 145" stroke="#3182CE" stroke-width="3" fill="none"/>
+  <polygon points="290,140 300,145 290,150" fill="#3182CE"/>
+
+  <!-- Stage 2 Card -->
+  <g transform="translate(300, 30)">
+    <rect width="240" height="230" rx="10" fill="url(#stage1)" stroke="#4A5568" stroke-width="2"/>
+    <rect width="240" height="35" rx="10" fill="#805AD5"/>
+    <text x="120" y="22" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="13">STAGE 2: MajorLogin Gateway</text>
+    <text x="15" y="60" font-family="sans-serif" font-size="11" fill="#E2E8F0">• AES-CBC Encrypted Payload</text>
+    <text x="15" y="80" font-family="sans-serif" font-size="11" fill="#CBD5E0">  Template Hex + Token</text>
+    <text x="15" y="110" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Parses Protobuf Response</text>
+    <text x="15" y="140" font-family="sans-serif" font-size="11" fill="#68D391">✔ Extracts: Dynamic Server URL</text>
+    <text x="15" y="165" font-family="sans-serif" font-size="11" fill="#CBD5E0">  AES Key & IV + Session JWT</text>
+    <text x="15" y="190" font-family="sans-serif" font-size="11" fill="#F6AD55">⚠️ If 503 -> SERVER_DOWN</text>
+  </g>
+
+  <!-- Connector 2 -->
+  <path d="M 540 145 L 570 145" stroke="#805AD5" stroke-width="3" fill="none"/>
+  <polygon points="570,140 580,145 570,150" fill="#805AD5"/>
+
+  <!-- Stage 3 Card -->
+  <g transform="translate(580, 30)">
+    <rect width="240" height="230" rx="10" fill="url(#stage1)" stroke="#4A5568" stroke-width="2"/>
+    <rect width="240" height="35" rx="10" fill="#38A169"/>
+    <text x="120" y="22" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="white" font-size="13">STAGE 3: PlayerPersonalShow</text>
+    <text x="15" y="60" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Encrypts Target UID</text>
+    <text x="15" y="80" font-family="sans-serif" font-size="11" fill="#CBD5E0">  dev_generator protobuf</text>
+    <text x="15" y="110" font-family="sans-serif" font-size="11" fill="#E2E8F0">• Queries GetPlayerPersonalShow</text>
+    <text x="15" y="140" font-family="sans-serif" font-size="11" fill="#68D391">✔ Decodes data_pb2 AccountInfo</text>
+    <text x="15" y="165" font-family="sans-serif" font-size="11" fill="#68D391">  (Level, Likes, Nick, Clan)</text>
+    <text x="15" y="190" font-family="sans-serif" font-size="11" fill="#38A169">🎉 Status -> ALIVE</text>
+  </g>
+</svg>

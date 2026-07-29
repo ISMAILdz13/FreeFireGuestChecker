@@ -156,7 +156,7 @@ Before installing, ensure your environment meets the following requirements:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/ISMAILdz13/guest-account-checker.git
+   git clone https://github.com/ISMAILdz13/FreeFireGuestChecker.git
    cd guest-account-checker
    ```
 
@@ -182,7 +182,7 @@ pkg update && pkg upgrade -y
 pkg install python git clang libcrypt -y
 
 # Step 2: Clone repository
-git clone https://github.com/ISMAILdz13/guest-account-checker.git
+git clone https://github.com/ISMAILdz13/FreeFireGuestChecker.git
 cd guest-account-checker
 
 # Step 3: Upgrade pip & install wheel build dependencies
@@ -485,7 +485,7 @@ Yes! The memory footprint is under 30MB, making it ideal for low-spec VPS instan
 
 Contributions are welcome! Follow these steps to contribute:
 
-1. Fork the repository (`https://github.com/ISMAILdz13/guest-account-checker`)
+1. Fork the repository (`https://github.com/ISMAILdz13/FreeFireGuestChecker`)
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit changes (`git commit -m 'feat: Add amazing feature'`)
 4. Push to branch (`git push origin feature/amazing-feature`)
@@ -507,6 +507,6 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 <div align="center">
 
-**[⭐ Star this repository on GitHub](https://github.com/ISMAILdz13/guest-account-checker)** if you found it useful!
+**[⭐ Star this repository on GitHub](https://github.com/ISMAILdz13/FreeFireGuestChecker)** if you found it useful!
 
 </div>

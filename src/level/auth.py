@@ -285,18 +285,18 @@ class LevelAuth:
             import sys
             import os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "level"))
-            from MajorLoginRes_pb2 import MajorLoginRes
+            from MajoRLoGinrEs_pb2 import MajorLoginRes
             from google.protobuf.timestamp_pb2 import Timestamp
 
             msg = MajorLoginRes()
             msg.ParseFromString(content)
 
             ts = Timestamp()
-            ts.FromNanoseconds(msg.kts)
+            ts.FromNanoseconds(msg.timestamp)
             combined = ts.seconds * 1_000_000_000 + ts.nanos
 
-            key = msg.ak if isinstance(msg.ak, bytes) else bytes.fromhex(msg.ak)
-            iv = msg.aiv if isinstance(msg.aiv, bytes) else bytes.fromhex(msg.aiv)
+            key = msg.key if isinstance(msg.key, bytes) else bytes.fromhex(msg.key)
+            iv = msg.iv if isinstance(msg.iv, bytes) else bytes.fromhex(msg.iv)
 
             return {
                 "token": msg.token,

@@ -38,6 +38,8 @@ MAJOR_LOGIN_URLS = [
     "https://loginbp.ggwhitehawk.com/MajorLogin",   # newest
     "https://loginbp.ggpolarbear.com/MajorLogin",   # primary
     "https://loginbp.ggblueshark.com/MajorLogin",   # fallback
+    "https://loginbp.common.ggbluefox.com/MajorLogin",  # additional fallback
+    "https://100067.connect.garena.com/MajorLogin",     # garena connect fallback
 ]
 
 # GetLoginData — dynamic from MajorLogin response, this is just a fallback
@@ -254,9 +256,21 @@ class LevelAuth:
                             )
                             return result
                         else:
+                            body_hint = ""
+                            try:
+                                snippet = resp.content[:120]
+                                # surface JSON/HTML error pages so failures are diagnosable
+                                printable = snippet.decode("utf-8", errors="replace")
+                                if any(c in printable for c in "{}<>"):
+                                    body_hint = f" | body[:120]={printable!r}"
+                                else:
+                                    body_hint = f" | body[:24]hex={snippet[:24].hex()}"
+                            except Exception:
+                                pass
                             logger.warning(
                                 f"MajorLogin {host}: 200 OK but parse failed, "
-                                f"trying raw parser..."
+                                f"len={len(resp.content)}, content_type="
+                                f"{resp.headers.get('content-type', '?')}{body_hint}"
                             )
                             result = self._parse_raw(resp.content)
                             if result and result.get("token"):

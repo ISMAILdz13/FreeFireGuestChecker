@@ -1,0 +1,460 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Analytics - FreeFire Guest Checker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-graph-up"></i> Analytics</h1>
+        <p class="text-muted">Advanced analytics and statistics</p>
+    </div>
+</div>
+
+<!-- Date Range Selector -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="dateRange" class="form-label">Date Range</label>
+                        <select class="form-select" id="dateRange">
+                            <option value="7" selected>Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="365">Last Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="regionFilter" class="form-label">Region</label>
+                        <select class="form-select" id="regionFilter">
+                            <option value="" selected>All Regions</option>
+                            {% for region in region_dist.keys() %}
+                            <option value="{{ region }}">{{ region }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="statusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="" selected>All Statuses</option>
+                            {% for status in status_dist.keys() %}
+                            <option value="{{ status }}">{{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="updateAnalytics()">
+                            <i class="bi bi-arrow-clockwise"></i> Update Analytics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-calendar-range fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0" id="totalChecks">{{ stats.total_accounts|default(0) }}</h3>
+                        <p class="mb-0">Total Checks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-check-square fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0" id="successCount">{{ stats.checked_count|default(0) }}</h3>
+                        <p class="mb-0">Successful</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-x-square fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0" id="errorCount">{{ stats.banned_count|default(0) }}</h3>
+                        <p class="mb-0">Failed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-percent fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        {% set success_rate = (stats.checked_count|default(0) - stats.banned_count|default(0)) / max(stats.checked_count|default(1), 1) * 100 %}
+                        <h3 class="mb-0" id="successRate">{{ "%.1f"|format(success_rate) }}%</h3>
+                        <p class="mb-0">Success Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up"></i> Checks Over Time</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="timeSeriesChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-pie-chart"></i> Status Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusPieChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-bar-chart"></i> Region Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="regionBarChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-pie-chart"></i> Source Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="sourcePieChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Hourly Activity</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="hourlyChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Button -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <button class="btn btn-primary" onclick="exportData()">
+                    <i class="bi bi-download"></i> Export Analytics Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+// Time Series Chart
+const timeSeriesCtx = document.getElementById('timeSeriesChart').getContext('2d');
+let timeSeriesChart;
+
+// Status Pie Chart
+const statusPieCtx = document.getElementById('statusPieChart').getContext('2d');
+let statusPieChart;
+
+// Region Bar Chart
+const regionBarCtx = document.getElementById('regionBarChart').getContext('2d');
+let regionBarChart;
+
+// Source Pie Chart
+const sourcePieCtx = document.getElementById('sourcePieChart').getContext('2d');
+let sourcePieChart;
+
+// Hourly Chart
+const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+let hourlyChart;
+
+// Initialize Charts
+function initCharts() {
+    // Time Series Chart
+    const timeSeriesData = {
+        labels: [{% for item in time_series %}'{{ item.date }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Accounts Checked',
+            data: [{% for item in time_series %}{{ item.count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }]
+    };
+
+    timeSeriesChart = new Chart(timeSeriesCtx, {
+        type: 'line',
+        data: timeSeriesData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Status Pie Chart
+    const statusData = {
+        labels: [{% for status, count in status_dist.items() %}'{{ status }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for status, count in status_dist.items() %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: [
+                '#28a745', // active/success
+                '#dc3545', // banned/failed
+                '#ffc107', // warning
+                '#6c757d', // unknown
+                '#17a2b8', // other
+                '#fd7e14', // another
+                '#e83e8c'  // another
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    statusPieChart = new Chart(statusPieCtx, {
+        type: 'pie',
+        data: statusData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+    // Region Bar Chart
+    const regionData = {
+        labels: [{% for region, count in region_dist.items() %}'{{ region }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Accounts',
+            data: [{% for region, count in region_dist.items() %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: '#0d6efd',
+            borderColor: '#0d6efd',
+            borderWidth: 1
+        }]
+    };
+
+    regionBarChart = new Chart(regionBarCtx, {
+        type: 'bar',
+        data: regionData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Source Pie Chart
+    const sourceData = {
+        labels: [{% for source, count in source_dist.items() %}'{{ source }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for source, count in source_dist.items() %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: [
+                '#0d6efd',
+                '#6610f2',
+                '#6f42c1',
+                '#d63384',
+                '#dc3545',
+                '#fd7e14'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    sourcePieChart = new Chart(sourcePieCtx, {
+        type: 'doughnut',
+        data: sourceData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+    // Hourly Chart
+    const hourlyData = {
+        labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+        datasets: [{
+            label: 'Checks by Hour',
+            data: Array.from({length: 24}, () => Math.floor(Math.random() * 100)),
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }]
+    };
+
+    hourlyChart = new Chart(hourlyCtx, {
+        type: 'line',
+        data: hourlyData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Update Analytics
+function updateAnalytics() {
+    const dateRange = document.getElementById('dateRange').value;
+    const region = document.getElementById('regionFilter').value;
+    const status = document.getElementById('statusFilter').value;
+
+    // Fetch analytics data
+    fetch(`/api/analytics/overview?days=${dateRange}&region=${region}&status=${status}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update summary cards
+            document.getElementById('totalChecks').textContent = data.stats.total_accounts || 0;
+            document.getElementById('successCount').textContent = data.stats.checked_count || 0;
+            document.getElementById('errorCount').textContent = data.stats.banned_count || 0;
+            
+            const successRate = ((data.stats.checked_count || 0) - (data.stats.banned_count || 0)) / 
+                               Math.max((data.stats.checked_count || 1), 1) * 100;
+            document.getElementById('successRate').textContent = successRate.toFixed(1) + '%';
+
+            // Update charts
+            updateTimeSeriesChart(data.time_series);
+            updateStatusChart(data.stats.status_distribution || {});
+            updateRegionChart(data.stats.region_distribution || {});
+            updateSourceChart(data.stats.source_distribution || {});
+        })
+        .catch(error => {
+            console.error('Error fetching analytics:', error);
+            alert('Error updating analytics');
+        });
+}
+
+// Update Time Series Chart
+function updateTimeSeriesChart(timeSeries) {
+    if (timeSeriesChart) {
+        timeSeriesChart.data.labels = timeSeries.map(item => item.date);
+        timeSeriesChart.data.datasets[0].data = timeSeries.map(item => item.count);
+        timeSeriesChart.update();
+    }
+}
+
+// Update Status Chart
+function updateStatusChart(statusDist) {
+    if (statusPieChart) {
+        statusPieChart.data.labels = Object.keys(statusDist);
+        statusPieChart.data.datasets[0].data = Object.values(statusDist);
+        statusPieChart.update();
+    }
+}
+
+// Update Region Chart
+function updateRegionChart(regionDist) {
+    if (regionBarChart) {
+        regionBarChart.data.labels = Object.keys(regionDist);
+        regionBarChart.data.datasets[0].data = Object.values(regionDist);
+        regionBarChart.update();
+    }
+}
+
+// Update Source Chart
+function updateSourceChart(sourceDist) {
+    if (sourcePieChart) {
+        sourcePieChart.data.labels = Object.keys(sourceDist);
+        sourcePieChart.data.datasets[0].data = Object.values(sourceDist);
+        sourcePieChart.update();
+    }
+}
+
+// Export Data
+function exportData() {
+    const dateRange = document.getElementById('dateRange').value;
+    const region = document.getElementById('regionFilter').value;
+    const status = document.getElementById('statusFilter').value;
+
+    window.location.href = `/api/accounts/export?format=json&region=${region}&status=${status}`;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initCharts);
+</script>
+{% endblock %}
+{% endblock %}

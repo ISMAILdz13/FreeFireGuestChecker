@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get version from tag
+      id: version
+      run: |
+        echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        name: FreeFire Guest Checker v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## What's New
+          
+          ### Changes
+          - See [CHANGELOG.md](https://github.com/ISMAILdz13/FreeFireGuestChecker/blob/v${{ steps.version.outputs.VERSION }}/CHANGELOG.md)
+          
+          ### Features
+          - Guest account checking with multiple authentication methods
+          - Web interface with REST API and WebSocket support
+          - Telegram and Discord bot integration
+          - Advanced analytics dashboard
+          - Multi-threaded batch account checking
+          - Docker containerization support
+          - SQLite database for persistent storage
+          - Comprehensive logging and monitoring
+          
+          ### Installation
+          
+          **Docker (Recommended):**
+          ```bash
+          docker pull ismaildz13/freefire-guest-checker:${{ steps.version.outputs.VERSION }}
+          docker run -d -p 5000:5000 --name freefire-checker ismaildz13/freefire-guest-checker:${{ steps.version.outputs.VERSION }}
+          ```
+          
+          **From Source:**
+          ```bash
+          git clone https://github.com/ISMAILdz13/FreeFireGuestChecker.git
+          cd FreeFireGuestChecker
+          pip install -r requirements.txt
+          python guest_checker_v2.py
+          ```
+        draft: false
+        prerelease: false
+        files: |
+          CHANGELOG.md
+          README.md
+          requirements.txt
+          Dockerfile
+          docker-compose.yml
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: |
+          ismaildz13/freefire-guest-checker:${{ steps.version.outputs.VERSION }}
+          ismaildz13/freefire-guest-checker:latest
+        labels: |
+          org.opencontainers.image.title=FreeFire Guest Checker
+          org.opencontainers.image.description=Free Fire Guest Account Checker
+          org.opencontainers.image.url=https://github.com/ISMAILdz13/FreeFireGuestChecker
+          org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
+
+    - name: Update Changelog
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        
+        # Create changelog entry
+        echo "## Version ${{ steps.version.outputs.VERSION }} - $(date +%Y-%m-%d)" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### New Features" >> CHANGELOG.md
+        echo "- Released version ${{ steps.version.outputs.VERSION }}" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        
+        git add CHANGELOG.md
+        git commit -m "docs: update changelog for v${{ steps.version.outputs.VERSION }}"
+        git push
+
+    - name: Notify Release
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          🎉 New Release: FreeFire Guest Checker v${{ steps.version.outputs.VERSION }}
+          
+          📦 Released: https://github.com/ISMAILdz13/FreeFireGuestChecker/releases/tag/v${{ steps.version.outputs.VERSION }}
+          🐳 Docker: ismaildz13/freefire-guest-checker:${{ steps.version.outputs.VERSION }}
+          
+          Changes: See CHANGELOG.md

@@ -1,0 +1,449 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard - FreeFire Guest Checker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+        <p class="text-muted">Overview and statistics for Free Fire Guest Account Checker</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-people-fill fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ stats.total_accounts|default(0) }}</h3>
+                        <p class="mb-0">Total Accounts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-check-circle-fill fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ stats.checked_count|default(0) }}</h3>
+                        <p class="mb-0">Checked Accounts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ stats.banned_count|default(0) }}</h3>
+                        <p class="mb-0">Banned Accounts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-percent fs-1"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        {% set success_rate = (stats.checked_count|default(0) - stats.banned_count|default(0)) / max(stats.checked_count|default(1), 1) * 100 %}
+                        <h3 class="mb-0">{{ "%.1f"|format(success_rate) }}%</h3>
+                        <p class="mb-0">Success Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="quickCheckAccountId" 
+                                   placeholder="Enter Account ID">
+                            <button class="btn btn-primary" onclick="quickCheck()">
+                                <i class="bi bi-search"></i> Check
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="batchCount" 
+                                   placeholder="Count" min="1" max="50" value="10">
+                            <button class="btn btn-success" onclick="batchCheck()">
+                                <i class="bi bi-plus-circle"></i> Batch Check
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-info w-100" onclick="refreshStats()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh Stats
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-pie-chart"></i> Status Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-bar-chart"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Accounts -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="bi bi-clock-history"></i> Recently Checked Accounts</h5>
+                <a href="/dashboard/accounts" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-list"></i> View All
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Account ID</th>
+                                <th>Status</th>
+                                <th>Region</th>
+                                <th>Checked At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in recent_accounts[:10] %}
+                            <tr>
+                                <td><code>{{ account.account_id }}</code></td>
+                                <td>
+                                    <span class="badge 
+                                        {% if account.status.value == 'active' %}bg-success
+                                        {% elif account.status.value == 'banned' %}bg-danger
+                                        {% elif account.status.value == 'unknown' %}bg-secondary
+                                        {% else %}bg-warning{% endif %}">
+                                        {{ account.status.value|default('unknown') }}
+                                    </span>
+                                </td>
+                                <td>{{ account.region|default('N/A') }}</td>
+                                <td>{{ account.updated_at|datetimeformat|default('N/A') }}</td>
+                                <td>
+                                    <a href="/dashboard/account/{{ account.account_id }}" 
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-cpu"></i> System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Database</h6>
+                                <p class="card-text text-success">
+                                    <i class="bi bi-check-circle"></i> Healthy
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">API</h6>
+                                <p class="card-text text-success">
+                                    <i class="bi bi-check-circle"></i> Online
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Cache</h6>
+                                <p class="card-text text-success">
+                                    <i class="bi bi-check-circle"></i> Ready
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Queue</h6>
+                                <p class="card-text text-success">
+                                    <i class="bi bi-check-circle"></i> Empty
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Check Result Modal -->
+<div class="modal fade" id="quickCheckModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Account Check Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="quickCheckResult">
+                <!-- Result will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Check Result Modal -->
+<div class="modal fade" id="batchCheckModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Batch Check Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="batchCheckResult">
+                <!-- Result will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+const statusData = {
+    labels: [{% for status, count in status_dist.items() %}'{{ status }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+    datasets: [{
+        data: [{% for status, count in status_dist.items() %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+        backgroundColor: [
+            '#28a745', // active
+            '#dc3545', // banned
+            '#ffc107', // warning
+            '#6c757d', // unknown
+            '#17a2b8'  // other
+        ],
+        borderWidth: 1
+    }]
+};
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: statusData,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'right'
+            }
+        }
+    }
+});
+
+// Activity Chart (Last 7 days)
+const activityCtx = document.getElementById('activityChart').getContext('2d');
+const activityData = {
+    labels: [{% for account in recent_accounts[:7] %}'{{ account.updated_at|datetimeformat|default('N/A') }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+    datasets: [{
+        label: 'Accounts Checked',
+        data: [{% for account in recent_accounts[:7] %}1{% if not loop.last %}, {% endif %}{% endfor %}],
+        backgroundColor: '#0d6efd',
+        borderColor: '#0d6efd',
+        borderWidth: 1
+    }]
+};
+new Chart(activityCtx, {
+    type: 'bar',
+    data: activityData,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Quick Check Function
+function quickCheck() {
+    const accountId = document.getElementById('quickCheckAccountId').value;
+    if (!accountId) {
+        alert('Please enter an account ID');
+        return;
+    }
+
+    fetch(`/api/accounts/check?account_id=${accountId}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById('quickCheckResult');
+            
+            if (data.error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else {
+                let html = `<div class="alert alert-success">
+                    <h5>Account: ${data.account_id}</h5>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Checked:</strong> ${data.checked_at || 'N/A'}</p>
+                `;
+                
+                if (data.data && data.data.data) {
+                    const guestData = data.data.data;
+                    html += `<p><strong>Nickname:</strong> ${guestData.nickname || 'N/A'}</p>`;
+                    html += `<p><strong>Level:</strong> ${guestData.level || 'N/A'}</p>`;
+                    html += `<p><strong>Diamonds:</strong> ${guestData.diamonds || 'N/A'}</p>`;
+                }
+                
+                html += `</div>`;
+                resultDiv.innerHTML = html;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('quickCheckModal'));
+            modal.show();
+        })
+        .catch(error => {
+            const resultDiv = document.getElementById('quickCheckResult');
+            resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            const modal = new bootstrap.Modal(document.getElementById('quickCheckModal'));
+            modal.show();
+        });
+}
+
+// Batch Check Function
+function batchCheck() {
+    const count = parseInt(document.getElementById('batchCount').value) || 10;
+    if (count < 1 || count > 50) {
+        alert('Please enter a count between 1 and 50');
+        return;
+    }
+
+    fetch(`/api/accounts/check-batch?count=${count}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById('batchCheckResult');
+            
+            if (data.error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else {
+                let html = `<div class="alert alert-info">
+                    <h5>Batch Check: ${data.total || 0} accounts</h5>
+                    <p><strong>Success:</strong> ${data.success || 0}</p>
+                    <p><strong>Errors:</strong> ${data.errors || 0}</p>
+                    <p><strong>Completed:</strong> ${data.completed_at || 'N/A'}</p>
+                `;
+                
+                if (data.results && data.results.length > 0) {
+                    html += `<table class="table table-sm mt-3">
+                        <thead><tr><th>Account ID</th><th>Status</th></tr></thead>
+                        <tbody>`;
+                    data.results.forEach(result => {
+                        html += `<tr>
+                            <td><code>${result.account_id}</code></td>
+                            <td>${result.status || 'unknown'}</td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table>`;
+                }
+                
+                html += `</div>`;
+                resultDiv.innerHTML = html;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('batchCheckModal'));
+            modal.show();
+        })
+        .catch(error => {
+            const resultDiv = document.getElementById('batchCheckResult');
+            resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            const modal = new bootstrap.Modal(document.getElementById('batchCheckModal'));
+            modal.show();
+        });
+}
+
+// Refresh Stats
+function refreshStats() {
+    location.reload();
+}
+
+// Auto-refresh every 30 seconds
+setTimeout(refreshStats, 30000);
+</script>
+{% endblock %}
+{% endblock %}

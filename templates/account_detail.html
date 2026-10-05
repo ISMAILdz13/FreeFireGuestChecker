@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Account Details - {{ account.uid }} - FF Guest Checker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="bi bi-person-circle"></i> Account Details</h1>
+                <p class="lead mb-0">UID: {{ account.uid }}</p>
+            </div>
+            <div>
+                <a href="{{ url_for('main.accounts_page') }}" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left"></i> Back to Accounts
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Account Info Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Account Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">UID:</dt>
+                        <dd class="col-sm-8">{{ account.uid }}</dd>
+                        
+                        <dt class="col-sm-4">Name:</dt>
+                        <dd class="col-sm-8">{{ account.name|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Region:</dt>
+                        <dd class="col-sm-8">{{ account.region|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Source:</dt>
+                        <dd class="col-sm-8">{{ account.source.value }}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            <span class="status-badge status-{{ account.status.value|lower }}">
+                                {{ account.status.value }}
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-4">Check Count:</dt>
+                        <dd class="col-sm-8">{{ account.check_count }}</dd>
+                        
+                        <dt class="col-sm-4">Created:</dt>
+                        <dd class="col-sm-8">{{ account.created_at.strftime('%Y-%m-%d %H:%M:%S') if account.created_at else '-' }}</dd>
+                        
+                        <dt class="col-sm-4">Last Checked:</dt>
+                        <dd class="col-sm-8">{{ account.last_checked.strftime('%Y-%m-%d %H:%M:%S') if account.last_checked else '-' }}</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            {% if account.notes %}
+            <div class="mt-3">
+                <h6>Notes:</h6>
+                <p class="text-muted">{{ account.notes }}</p>
+            </div>
+            {% endif %}
+            
+            {% if account.tags %}
+            <div class="mt-3">
+                <h6>Tags:</h6>
+                {% for tag in account.tags %}
+                <span class="badge bg-secondary me-1">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Player Info Card -->
+    {% if account.last_check_result %}
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-controller"></i> Player Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Nickname:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.nickname|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Level:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.level|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">EXP:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.exp|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Rank:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.rank|default('-') }}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Likes:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.likes|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Region:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.region|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Release Version:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.release_version|default('-') }}</dd>
+                        
+                        <dt class="col-sm-4">Credit Score:</dt>
+                        <dd class="col-sm-8">{{ account.last_check_result.credit_score|default('-') }}</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            {% if account.last_check_result.clan_name %}
+            <div class="mt-3 pt-3 border-top">
+                <h6><i class="bi bi-people"></i> Clan Information</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Clan Name:</dt>
+                    <dd class="col-sm-8">{{ account.last_check_result.clan_name }}</dd>
+                    
+                    <dt class="col-sm-4">Clan Level:</dt>
+                    <dd class="col-sm-8">{{ account.last_check_result.clan_level|default('-') }}</dd>
+                </dl>
+            </div>
+            {% endif %}
+            
+            {% if account.last_check_result.last_login %}
+            <div class="mt-3 pt-3 border-top">
+                <h6><i class="bi bi-calendar"></i> Activity</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Last Login:</dt>
+                    <dd class="col-sm-8">{{ account.last_check_result.last_login }}</dd>
+                    
+                    <dt class="col-sm-4">Account Created:</dt>
+                    <dd class="col-sm-8">{{ account.last_check_result.account_created|default('-') }}</dd>
+                </dl>
+            </div>
+            {% endif %}
+            
+            {% if account.last_check_result.ban_reason %}
+            <div class="mt-3 pt-3 border-top">
+                <h6><i class="bi bi-exclamation-triangle"></i> Ban Information</h6>
+                <p class="text-danger">{{ account.last_check_result.ban_reason }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Check History Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Check History</h5>
+        </div>
+        <div class="card-body">
+            {% if check_results %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Level</th>
+                            <th>Likes</th>
+                            <th>Region</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in check_results %}
+                        <tr>
+                            <td>{{ result.checked_at.strftime('%Y-%m-%d %H:%M:%S') if result.checked_at else '-' }}</td>
+                            <td>
+                                <span class="status-badge status-{{ result.status.value|lower }}">
+                                    {{ result.status.value }}
+                                </span>
+                            </td>
+                            <td>{{ result.level|default('-') }}</td>
+                            <td>{{ result.likes|default('-') }}</td>
+                            <td>{{ result.region|default('-') }}</td>
+                            <td>{{ result.ban_reason|default('-') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-2">No check history available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Actions Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-tools"></i> Actions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('main.check_page') }}?uid={{ account.uid }}" 
+                       class="btn btn-primary w-100">
+                        <i class="bi bi-arrow-repeat"></i> Check Again
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" 
+                            data-bs-target="#editModal">
+                        <i class="bi bi-pencil"></i> Edit
+                    </button>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" 
+                            data-bs-target="#deleteModal">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil"></i> Edit Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editName" 
+                               value="{{ account.name|default('') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRegion" class="form-label">Region</label>
+                        <select class="form-select" id="editRegion">
+                            <option value="GLOBAL" {% if account.region == 'GLOBAL' %}selected{% endif %}>Global</option>
+                            <option value="INDIA" {% if account.region == 'INDIA' %}selected{% endif %}>India</option>
+                            <option value="INDONESIA" {% if account.region == 'INDONESIA' %}selected{% endif %}>Indonesia</option>
+                            <option value="BRAZIL" {% if account.region == 'BRAZIL' %}selected{% endif %}>Brazil</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="editNotes" rows="3">{{ account.notes|default('') }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-trash"></i> Delete Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete account <strong>{{ account.uid }}</strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

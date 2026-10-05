@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}Check Accounts - FF Guest Checker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="container">
+        <h1><i class="bi bi-play-circle"></i> Check Accounts</h1>
+        <p class="lead mb-0">Verify the status of your Free Fire guest accounts</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Check Options -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-sliders"></i> Check Options</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="" id="checkForm">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="concurrent" class="form-label">Concurrent Workers</label>
+                        <input type="number" class="form-control" id="concurrent" name="concurrent"
+                               value="{{ config.checker.concurrent_workers }}" min="1" max="50">
+                        <div class="form-text">Number of accounts to check simultaneously</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="timeout" class="form-label">Timeout (seconds)</label>
+                        <input type="number" class="form-control" id="timeout" name="timeout"
+                               value="{{ config.rate_limit.request_timeout }}" min="5" max="120" step="0.5">
+                        <div class="form-text">Request timeout in seconds</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="retries" class="form-label">Retry Attempts</label>
+                        <input type="number" class="form-control" id="retries" name="retries"
+                               value="{{ config.rate_limit.retry_attempts }}" min="0" max="10">
+                        <div class="form-text">Number of times to retry failed requests</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Proxy</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="useProxy" name="useProxy"
+                                   {% if config.proxy.enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="useProxy">Use Proxy</label>
+                        </div>
+                        <div id="proxySettings" style="display: {% if config.proxy.enabled %}block{% else %}none{% endif %};">
+                            <div class="input-group mt-2">
+                                <select class="form-select" style="width: 100px;">
+                                    <option value="http" {% if config.proxy.proxy_type.value == 'http' %}selected{% endif %}>HTTP</option>
+                                    <option value="https" {% if config.proxy.proxy_type.value == 'https' %}selected{% endif %}>HTTPS</option>
+                                    <option value="socks5" {% if config.proxy.proxy_type.value == 'socks5' %}selected{% endif %}>SOCKS5</option>
+                                </select>
+                                <input type="text" class="form-control" placeholder="Host"
+                                       value="{{ config.proxy.host }}">
+                                <input type="number" class="form-control" placeholder="Port" style="width: 80px;"
+                                       value="{{ config.proxy.port }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Output Format</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="outputFormat" id="formatJson" 
+                                   value="json" checked>
+                            <label class="form-check-label" for="formatJson">JSON</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="outputFormat" id="formatCsv" 
+                                   value="csv">
+                            <label class="form-check-label" for="formatCsv">CSV</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="outputFormat" id="formatDb" 
+                                   value="db">
+                            <label class="form-check-label" for="formatDb">Database</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-play-circle"></i> Start Checking
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Account Selection -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-list-check"></i> Select Accounts to Check</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary" id="selectAll">
+                        <i class="bi bi-check-square"></i> Select All
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="selectNone">
+                        <i class="bi bi-square"></i> Select None
+                    </button>
+                </div>
+                <div>
+                    <span id="selectedCount">0 accounts selected</span>
+                </div>
+            </div>
+            
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="50">
+                                <input type="checkbox" id="selectAllCheckbox">
+                            </th>
+                            <th>UID</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Region</th>
+                            <th>Last Checked</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(20) %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="account-checkbox">
+                            </td>
+                            <td>584251186{{ i }}</td>
+                            <td>BOT{{ i }}001</td>
+                            <td><span class="status-badge status-{{ ['ALIVE', 'BANNED', 'DEAD', 'SERVER_DOWN', 'UNKNOWN'][i % 5]|lower }}">{{ ['ALIVE', 'BANNED', 'DEAD', 'SERVER_DOWN', 'UNKNOWN'][i % 5] }}</span></td>
+                            <td>GLOBAL</td>
+                            <td>2024-01-{{ '%02d'|format(i + 1) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Display (hidden by default) -->
+    <div class="card mb-4 d-none" id="progressCard">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-activity"></i> Progress</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="mb-0">
+                        <span id="progressText">Checking 0 of 0 accounts...</span>
+                    </h4>
+                </div>
+                <div>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+            
+            <div class="progress mb-3" style="height: 25px;">
+                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                     role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-success mb-0">Alive</h6>
+                            <p class="mb-0" id="aliveCount">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-danger mb-0">Banned</h6>
+                            <p class="mb-0" id="bannedCount">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-warning mb-0">Server Down</h6>
+                            <p class="mb-0" id="serverDownCount">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-dark mb-0">Dead</h6>
+                            <p class="mb-0" id="deadCount">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <div class="card">
+                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                        <div id="progressLog" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9rem;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white text-end">
+            <button class="btn btn-sm btn-outline-danger" id="cancelCheck">
+                <i class="bi bi-stop-circle"></i> Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Results Display (hidden by default) -->
+    <div class="card mb-4 d-none" id="resultsCard">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-check2-circle"></i> Results</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>UID</th>
+                            <th>Status</th>
+                            <th>Nickname</th>
+                            <th>Level</th>
+                            <th>Likes</th>
+                            <th>Region</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                        <!-- Results will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white text-end">
+            <button class="btn btn-sm btn-outline-primary" id="exportResults">
+                <i class="bi bi-download"></i> Export Results
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Proxy toggle
+document.getElementById('useProxy').addEventListener('change', function() {
+    const proxySettings = document.getElementById('proxySettings');
+    proxySettings.style.display = this.checked ? 'block' : 'none';
+});
+
+// Account selection
+document.getElementById('selectAll').addEventListener('click', function() {
+    document.querySelectorAll('.account-checkbox').forEach(cb => cb.checked = true);
+    updateSelectedCount();
+});
+
+document.getElementById('selectNone').addEventListener('click', function() {
+    document.querySelectorAll('.account-checkbox').forEach(cb => cb.checked = false);
+    updateSelectedCount();
+});
+
+document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+    document.querySelectorAll('.account-checkbox').forEach(cb => cb.checked = this.checked);
+    updateSelectedCount();
+});
+
+function updateSelectedCount() {
+    const count = document.querySelectorAll('.account-checkbox:checked').length;
+    document.getElementById('selectedCount').textContent = `${count} account${count !== 1 ? 's' : ''} selected`;
+}
+
+// Update count when checkboxes change
+document.querySelectorAll('.account-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateSelectedCount);
+});
+
+// Form submission
+document.getElementById('checkForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show progress card
+    document.getElementById('progressCard').classList.remove('d-none');
+    
+    // Simulate checking (in real implementation, this would call the API)
+    simulateChecking();
+});
+
+// Simulate checking process
+function simulateChecking() {
+    const total = 20;
+    let checked = 0;
+    const statuses = ['ALIVE', 'BANNED', 'DEAD', 'SERVER_DOWN', 'UNKNOWN'];
+    
+    const interval = setInterval(() => {
+        checked++;
+        
+        // Update progress
+        const progress = Math.round((checked / total) * 100);
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        document.getElementById('progressBar').setAttribute('aria-valuenow', progress);
+        document.getElementById('progressPercent').textContent = `${progress}%`;
+        document.getElementById('progressText').textContent = `Checking ${checked} of ${total} accounts...`;
+        
+        // Add to log
+        const uid = 5842511860 + checked;
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const logEntry = `[${checked}/${total}] ${uid} - ${status}\n`;
+        document.getElementById('progressLog').textContent += logEntry;
+        document.getElementById('progressLog').scrollTop = document.getElementById('progressLog').scrollHeight;
+        
+        // Update counts
+        if (status === 'ALIVE') {
+            const count = parseInt(document.getElementById('aliveCount').textContent) + 1;
+            document.getElementById('aliveCount').textContent = count;
+        } else if (status === 'BANNED') {
+            const count = parseInt(document.getElementById('bannedCount').textContent) + 1;
+            document.getElementById('bannedCount').textContent = count;
+        } else if (status === 'SERVER_DOWN') {
+            const count = parseInt(document.getElementById('serverDownCount').textContent) + 1;
+            document.getElementById('serverDownCount').textContent = count;
+        } else if (status === 'DEAD') {
+            const count = parseInt(document.getElementById('deadCount').textContent) + 1;
+            document.getElementById('deadCount').textContent = count;
+        }
+        
+        // Add to results table
+        addResultToTable(uid, status);
+        
+        // Finish
+        if (checked >= total) {
+            clearInterval(interval);
+            document.getElementById('progressText').textContent = `Checked ${total} accounts!`;
+            document.getElementById('resultsCard').classList.remove('d-none');
+        }
+    }, 500);
+}
+
+function addResultToTable(uid, status) {
+    const table = document.getElementById('resultsTable');
+    const row = document.createElement('tr');
+    
+    const statusClass = `status-${status.toLowerCase()}`;
+    const level = Math.floor(Math.random() * 50) + 1;
+    const likes = Math.floor(Math.random() * 1000);
+    const regions = ['GLOBAL', 'INDIA', 'INDONESIA', 'BRAZIL'];
+    const region = regions[Math.floor(Math.random() * regions.length)];
+    const duration = (Math.random() * 2 + 0.5).toFixed(2);
+    
+    row.innerHTML = `
+        <td>${uid}</td>
+        <td><span class="status-badge ${statusClass}">${status}</span></td>
+        <td>BOT${uid.toString().slice(-3)}</td>
+        <td>${level}</td>
+        <td>${likes}</td>
+        <td>${region}</td>
+        <td>${duration}s</td>
+    `;
+    
+    table.appendChild(row);
+}
+
+// Cancel check
+document.getElementById('cancelCheck').addEventListener('click', function() {
+    // In real implementation, this would cancel the ongoing check
+    alert('Check cancelled!');
+    document.getElementById('progressCard').classList.add('d-none');
+});
+
+// Export results
+document.getElementById('exportResults').addEventListener('click', function() {
+    alert('Results exported!');
+});
+</script>
+{% endblock %}

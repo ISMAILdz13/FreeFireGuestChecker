@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - FF Guest Checker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="container">
+        <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+        <p class="lead mb-0">Monitor and manage your Free Fire guest accounts</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Stats Cards -->
+    {% if db_stats.total > 0 %}
+    <div class="row mb-4">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card">
+                <i class="bi bi-people-fill text-primary mb-2" style="font-size: 2rem;"></i>
+                <div class="stat-value">{{ db_stats.total }}</div>
+                <div class="stat-label">Total Accounts</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card">
+                <i class="bi bi-check-circle-fill text-success mb-2" style="font-size: 2rem;"></i>
+                <div class="stat-value">{{ db_stats.alive|default(0) }}</div>
+                <div class="stat-label">Alive</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card">
+                <i class="bi bi-x-circle-fill text-danger mb-2" style="font-size: 2rem;"></i>
+                <div class="stat-value">{{ db_stats.banned|default(0) + db_stats.blacklisted|default(0) }}</div>
+                <div class="stat-label">Banned/Blacklisted</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card">
+                <i class="bi bi-exclamation-circle-fill text-warning mb-2" style="font-size: 2rem;"></i>
+                <div class="stat-value">{{ db_stats.dead|default(0) + db_stats.server_down|default(0) + db_stats.unknown|default(0) }}</div>
+                <div class="stat-label">Issues</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No accounts in database. 
+        <a href="{{ url_for('main.accounts_page') }}" class="alert-link">Add accounts</a> to get started.
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('main.accounts_page') }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-list"></i> View All Accounts
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('main.check_page') }}" class="btn btn-outline-success w-100">
+                        <i class="bi bi-play-circle"></i> Check Accounts
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('main.settings_page') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    {% if db_stats.total > 0 %}
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-activity"></i> Account Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-globe"></i> Regional Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="regionChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- API Info -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-code-slash"></i> API Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>API Status</h6>
+                    <p class="text-muted">
+                        Base URL: <code>{{ url_for('api.api_status', _external=True) }}</code>
+                    </p>
+                    <p class="text-muted">
+                        Version: <code>v1</code>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Endpoints</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li><code>GET /api/status</code> - Health check</li>
+                        <li><code>GET /api/accounts</code> - List accounts</li>
+                        <li><code>GET /api/accounts/{uid}</code> - Get account</li>
+                        <li><code>POST /api/check</code> - Check accounts</li>
+                        <li><code>GET /api/stats</code> - Get statistics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Status Chart
+const statusCtx = document.getElementById('statusChart');
+if (statusCtx) {
+    const statusData = {
+        labels: ['Alive', 'Banned', 'Dead', 'Server Down', 'Blacklisted', 'Unknown'],
+        datasets: [{
+            data: [
+                {{ db_stats.alive|default(0) }},
+                {{ db_stats.banned|default(0) }},
+                {{ db_stats.dead|default(0) }},
+                {{ db_stats.server_down|default(0) }},
+                {{ db_stats.blacklisted|default(0) }},
+                {{ db_stats.unknown|default(0) }}
+            ],
+            backgroundColor: [
+                '#28a745',
+                '#dc3545',
+                '#343a40',
+                '#ffc107',
+                '#fd7e14',
+                '#6c757d'
+            ],
+            borderWidth: 0
+        }]
+    };
+    
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: statusData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Region Chart
+const regionCtx = document.getElementById('regionChart');
+if (regionCtx) {
+    // This would be populated with actual data in a real implementation
+    const regionData = {
+        labels: ['GLOBAL', 'INDIA', 'INDONESIA', 'BRAZIL', 'Other'],
+        datasets: [{
+            data: [
+                {{ db_stats.total|default(0) / 2|int }},
+                {{ db_stats.total|default(0) / 4|int }},
+                {{ db_stats.total|default(0) / 8|int }},
+                {{ db_stats.total|default(0) / 16|int }},
+                {{ db_stats.total|default(0) - (db_stats.total|default(0) / 2 + db_stats.total|default(0) / 4 + db_stats.total|default(0) / 8 + db_stats.total|default(0) / 16)|int }}
+            ],
+            backgroundColor: [
+                '#17a2b8',
+                '#6610f2',
+                '#20c997',
+                '#fd7e14',
+                '#6c757d'
+            ],
+            borderWidth: 0
+        }]
+    };
+    
+    new Chart(regionCtx, {
+        type: 'pie',
+        data: regionData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

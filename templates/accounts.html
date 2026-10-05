@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Accounts - FF Guest Checker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="container">
+        <h1><i class="bi bi-people"></i> Accounts</h1>
+        <p class="lead mb-0">Manage and view your Free Fire guest accounts</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('main.accounts_page') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="ALIVE" {% if status == 'ALIVE' %}selected{% endif %}>Alive</option>
+                        <option value="BANNED" {% if status == 'BANNED' %}selected{% endif %}>Banned</option>
+                        <option value="DEAD" {% if status == 'DEAD' %}selected{% endif %}>Dead</option>
+                        <option value="SERVER_DOWN" {% if status == 'SERVER_DOWN' %}selected{% endif %}>Server Down</option>
+                        <option value="BLACKLISTED" {% if status == 'BLACKLISTED' %}selected{% endif %}>Blacklisted</option>
+                        <option value="UNKNOWN" {% if status == 'UNKNOWN' %}selected{% endif %}>Unknown</option>
+                        <option value="PENDING" {% if status == 'PENDING' %}selected{% endif %}>Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="region" class="form-label">Region</label>
+                    <select class="form-select" id="region" name="region">
+                        <option value="">All Regions</option>
+                        <option value="GLOBAL" {% if region == 'GLOBAL' %}selected{% endif %}>Global</option>
+                        <option value="INDIA" {% if region == 'INDIA' %}selected{% endif %}>India</option>
+                        <option value="INDONESIA" {% if region == 'INDONESIA' %}selected{% endif %}>Indonesia</option>
+                        <option value="BRAZIL" {% if region == 'BRAZIL' %}selected{% endif %}>Brazil</option>
+                        <option value="LATAM" {% if region == 'LATAM' %}selected{% endif %}>Latam</option>
+                        <option value="MENA" {% if region == 'MENA' %}selected{% endif %}>MENA</option>
+                        <option value="SEA" {% if region == 'SEA' %}selected{% endif %}>SEA</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search|default('') }}" placeholder="UID, Name, Notes...">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list"></i> Accounts ({{ total }})</h5>
+            <a href="{{ url_for('main.check_page') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-play-circle"></i> Check Selected
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if accounts %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="50">
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th>UID</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Region</th>
+                            <th>Level</th>
+                            <th>Checks</th>
+                            <th>Last Checked</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="account-checkbox" value="{{ account.uid }}">
+                            </td>
+                            <td>
+                                <a href="{{ url_for('main.account_detail', uid=account.uid) }}" 
+                                   class="text-decoration-none">
+                                    {{ account.uid }}
+                                </a>
+                            </td>
+                            <td>{{ account.name|default('-') }}</td>
+                            <td>
+                                <span class="status-badge status-{{ account.status.value|lower }}">
+                                    {{ account.status.value }}
+                                </span>
+                            </td>
+                            <td>{{ account.region|default('-') }}</td>
+                            <td>{{ account.last_check_result.level|default('-') if account.last_check_result else '-' }}</td>
+                            <td>{{ account.check_count }}</td>
+                            <td>{{ account.last_checked.strftime('%Y-%m-%d %H:%M') if account.last_checked else '-' }}</td>
+                            <td>
+                                <a href="{{ url_for('main.account_detail', uid=account.uid) }}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-2">No accounts found</p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-footer bg-white">
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0 justify-content-center">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page - 1 }}&per_page={{ per_page }}&status={{ status }}&region={{ region }}&search={{ search }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p <= 3 or p > total_pages - 3 or (p >= page - 2 and p <= page + 2) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="?page={{ p }}&per_page={{ per_page }}&status={{ status }}&region={{ region }}&search={{ search }}">
+                                {{ p }}
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if p == 3 and page > 5 %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                        {% if p == total_pages - 3 and page < total_pages - 4 %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page + 1 }}&per_page={{ per_page }}&status={{ status }}&region={{ region }}&search={{ search }}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            <div class="text-muted text-center mt-2">
+                Showing {{ (page - 1) * per_page + 1 }} to {{ min(page * per_page, total) }} of {{ total }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Select all checkboxes
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.account-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+</script>
+{% endblock %}

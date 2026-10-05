@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - FF Guest Checker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="container">
+        <h1><i class="bi bi-gear"></i> Settings</h1>
+        <p class="lead mb-0">Configure application settings</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" 
+                    data-bs-target="#general" type="button" role="tab">
+                <i class="bi bi-gear"></i> General
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="database-tab" data-bs-toggle="tab" 
+                    data-bs-target="#database" type="button" role="tab">
+                <i class="bi bi-database"></i> Database
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="proxy-tab" data-bs-toggle="tab" 
+                    data-bs-target="#proxy" type="button" role="tab">
+                <i class="bi bi-globe"></i> Proxy
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rateLimit-tab" data-bs-toggle="tab" 
+                    data-bs-target="#rateLimit" type="button" role="tab">
+                <i class="bi bi-hourglass-split"></i> Rate Limiting
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="web-tab" data-bs-toggle="tab" 
+                    data-bs-target="#web" type="button" role="tab">
+                <i class="bi bi-browser-chrome"></i> Web Interface
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="settingsTabsContent">
+        <!-- General Settings -->
+        <div class="tab-pane fade show active" id="general" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> General Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="appName" class="form-label">Application Name</label>
+                                <input type="text" class="form-control" id="appName" 
+                                       value="{{ config.app_name }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="version" class="form-label">Version</label>
+                                <input type="text" class="form-control" id="version" 
+                                       value="{{ config.version }}" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="environment" class="form-label">Environment</label>
+                                <select class="form-select" id="environment">
+                                    <option value="development" {% if config.environment == 'development' %}selected{% endif %}>Development</option>
+                                    <option value="staging" {% if config.environment == 'staging' %}selected{% endif %}>Staging</option>
+                                    <option value="production" {% if config.environment == 'production' %}selected{% endif %}>Production</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="logLevel" class="form-label">Log Level</label>
+                                <select class="form-select" id="logLevel">
+                                    <option value="DEBUG" {% if config.logging.level.value == 'DEBUG' %}selected{% endif %}>Debug</option>
+                                    <option value="INFO" {% if config.logging.level.value == 'INFO' %}selected{% endif %}>Info</option>
+                                    <option value="WARNING" {% if config.logging.level.value == 'WARNING' %}selected{% endif %}>Warning</option>
+                                    <option value="ERROR" {% if config.logging.level.value == 'ERROR' %}selected{% endif %}>Error</option>
+                                    <option value="CRITICAL" {% if config.logging.level.value == 'CRITICAL' %}selected{% endif %}>Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Settings -->
+        <div class="tab-pane fade" id="database" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-database"></i> Database Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="dbEnabled"
+                                           {% if config.database.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="dbEnabled">Enable Database</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dbPath" class="form-label">Database Path</label>
+                                <input type="text" class="form-control" id="dbPath" 
+                                       value="{{ config.database.path }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dbBackupPath" class="form-label">Backup Path</label>
+                                <input type="text" class="form-control" id="dbBackupPath" 
+                                       value="{{ config.database.backup_path }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="dbMaxBackups" class="form-label">Max Backups</label>
+                                <input type="number" class="form-control" id="dbMaxBackups" 
+                                       value="{{ config.database.max_backups }}" min="1" max="20">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="dbAutoBackup"
+                                           {% if config.database.auto_backup %}checked{% endif %}>
+                                    <label class="form-check-label" for="dbAutoBackup">Auto Backup</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="dbVacuum"
+                                           {% if config.database.vacuum_on_startup %}checked{% endif %}>
+                                    <label class="form-check-label" for="dbVacuum">Vacuum on Startup</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proxy Settings -->
+        <div class="tab-pane fade" id="proxy" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-globe"></i> Proxy Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="proxyEnabled"
+                                           {% if config.proxy.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="proxyEnabled">Enable Proxy</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="proxySettings" style="display: {% if config.proxy.enabled %}block{% else %}none{% endif %};">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="proxyType" class="form-label">Proxy Type</label>
+                                    <select class="form-select" id="proxyType">
+                                        <option value="http" {% if config.proxy.proxy_type.value == 'http' %}selected{% endif %}>HTTP</option>
+                                        <option value="https" {% if config.proxy.proxy_type.value == 'https' %}selected{% endif %}>HTTPS</option>
+                                        <option value="socks4" {% if config.proxy.proxy_type.value == 'socks4' %}selected{% endif %}>SOCKS4</option>
+                                        <option value="socks5" {% if config.proxy.proxy_type.value == 'socks5' %}selected{% endif %}>SOCKS5</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="proxyHost" class="form-label">Host</label>
+                                    <input type="text" class="form-control" id="proxyHost" 
+                                           value="{{ config.proxy.host }}" placeholder="proxy.example.com">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="proxyPort" class="form-label">Port</label>
+                                    <input type="number" class="form-control" id="proxyPort" 
+                                           value="{{ config.proxy.port }}" min="1" max="65535">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="proxyUsername" class="form-label">Username (Optional)</label>
+                                    <input type="text" class="form-control" id="proxyUsername" 
+                                           value="{{ config.proxy.username }}" placeholder="username">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="proxyPassword" class="form-label">Password (Optional)</label>
+                                    <input type="password" class="form-control" id="proxyPassword" 
+                                           value="{{ config.proxy.password }}" placeholder="password">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="proxyRotate"
+                                               {% if config.proxy.rotate_on_failure %}checked{% endif %}>
+                                        <label class="form-check-label" for="proxyRotate">Rotate on Failure</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="proxyRotationInterval" class="form-label">Rotation Interval (seconds)</label>
+                                    <input type="number" class="form-control" id="proxyRotationInterval" 
+                                           value="{{ config.proxy.rotation_interval }}" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Limiting Settings -->
+        <div class="tab-pane fade" id="rateLimit" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Rate Limiting Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="rateLimitEnabled"
+                                           {% if config.rate_limit.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="rateLimitEnabled">Enable Rate Limiting</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="maxRequests" class="form-label">Max Requests/Minute</label>
+                                <input type="number" class="form-control" id="maxRequests" 
+                                       value="{{ config.rate_limit.max_requests_per_minute }}" min="1" max="1000">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="maxConcurrent" class="form-label">Max Concurrent Requests</label>
+                                <input type="number" class="form-control" id="maxConcurrent" 
+                                       value="{{ config.rate_limit.max_concurrent_requests }}" min="1" max="50">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="requestTimeout" class="form-label">Request Timeout (seconds)</label>
+                                <input type="number" class="form-control" id="requestTimeout" 
+                                       value="{{ config.rate_limit.request_timeout }}" min="1" max="120" step="0.5">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="retryAttempts" class="form-label">Retry Attempts</label>
+                                <input type="number" class="form-control" id="retryAttempts" 
+                                       value="{{ config.rate_limit.retry_attempts }}" min="0" max="10">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="retryDelay" class="form-label">Retry Delay (seconds)</label>
+                                <input type="number" class="form-control" id="retryDelay" 
+                                       value="{{ config.rate_limit.retry_delay }}" min="0" max="10" step="0.5">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="backoffMultiplier" class="form-label">Backoff Multiplier</label>
+                                <input type="number" class="form-control" id="backoffMultiplier" 
+                                       value="{{ config.rate_limit.backoff_multiplier }}" min="1" max="5" step="0.1">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="cooldownEnabled"
+                                           {% if config.rate_limit.cooldown_on_rate_limit %}checked{% endif %}>
+                                    <label class="form-check-label" for="cooldownEnabled">Cooldown on Rate Limit</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cooldownSeconds" class="form-label">Cooldown Duration (seconds)</label>
+                                <input type="number" class="form-control" id="cooldownSeconds" 
+                                       value="{{ config.rate_limit.cooldown_seconds }}" min="0" max="3600">
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Web Interface Settings -->
+        <div class="tab-pane fade" id="web" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-browser-chrome"></i> Web Interface Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="webEnabled"
+                                           {% if config.web.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="webEnabled">Enable Web Interface</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="webSettings" style="display: {% if config.web.enabled %}block{% else %}none{% endif %};">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="webHost" class="form-label">Host</label>
+                                    <input type="text" class="form-control" id="webHost" 
+                                           value="{{ config.web.host }}" placeholder="0.0.0.0">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="webPort" class="form-label">Port</label>
+                                    <input type="number" class="form-control" id="webPort" 
+                                           value="{{ config.web.port }}" min="1" max="65535">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="webSecret" class="form-label">Secret Key</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="webSecret" 
+                                               value="{{ config.web.secret_key }}" placeholder="Enter secret key">
+                                        <button class="btn btn-outline-secondary" type="button" id="generateSecret">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="webTimeout" class="form-label">Session Timeout (seconds)</label>
+                                    <input type="number" class="form-control" id="webTimeout" 
+                                           value="{{ config.web.session_timeout }}" min="60" max="86400">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="webOrigins" class="form-label">CORS Origins (comma separated)</label>
+                                    <input type="text" class="form-control" id="webOrigins" 
+                                           value="{{ config.web.cors_origins|join(', ') }}" 
+                                           placeholder="http://localhost:3000, https://example.com">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="webDebug"
+                                               {% if config.web.debug %}checked{% endif %}>
+                                        <label class="form-check-label" for="webDebug">Debug Mode</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Proxy toggle
+document.getElementById('proxyEnabled').addEventListener('change', function() {
+    const proxySettings = document.getElementById('proxySettings');
+    proxySettings.style.display = this.checked ? 'block' : 'none';
+});
+
+// Web interface toggle
+document.getElementById('webEnabled').addEventListener('change', function() {
+    const webSettings = document.getElementById('webSettings');
+    webSettings.style.display = this.checked ? 'block' : 'none';
+});
+
+// Generate secret key
+document.getElementById('generateSecret').addEventListener('click', function() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+        secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('webSecret').value = secret;
+});
+
+// Tab activation
+const tabEl = document.querySelectorAll('#settingsTabs button')
+tabEl.forEach(tab => {
+    tab.addEventListener('shown.bs.tab', event => {
+        // Save current tab to localStorage
+        localStorage.setItem('activeSettingsTab', event.target.id);
+    });
+});
+
+// Restore active tab
+const activeTab = localStorage.getItem('activeSettingsTab');
+if (activeTab) {
+    const tab = document.getElementById(activeTab);
+    if (tab) {
+        const bsTab = new bootstrap.Tab(tab);
+        bsTab.show();
+    }
+}
+</script>
+{% endblock %}
